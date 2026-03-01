@@ -1,0 +1,7 @@
+#EXTM3U
+#EXTINF:-1 tvg-name="SBT" group-title="Brasil",SBT
+https://www.youtube.com/watch?v=ABVQXgr2LW4
+#EXTINF:-1 tvg-name="TV Cultura" group-title="Brasil",TV Cultura
+https://www.youtube.com/watch?v=kQFWp6IppTI
+#EXTINF:-1 tvg-name="Record News" group-title="Notícias",Record News
+https://stream.ads.ottera.tv/playlist.m3u8?network_id=2116

@@ -1,41 +1,31 @@
-#!/usr/bin/env python3
-import requests
-from pathlib import Path
+name: Robô Automático AngoStream
 
-def test_link(url):
-    try:
-        if 'youtube.com' in url or 'youtu.be' in url:
-            return True, "YouTube OK"
-        r = requests.head(url, timeout=5, allow_redirects=True)
-        return r.status_code < 400, f"HTTP {r.status_code}"
-    except:
-        return False, "Falhou"
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'playlist_angostream.m3u'
+      - 'scripts/check_links.py'
 
-def process_playlist():
-    caminho = Path("playlist_angostream.m3u")
+jobs:
+  verificar-links:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
-    print("🔍 A testar links...")
-    
-    with open(caminho, 'r') as f:
-        linhas = f.readlines()
-    
-    ok = 0
-    falha = 0
-    
-    for linha in linhas:
-        if linha.startswith('http'):
-            linha = linha.strip()
-            print(f"\nTestando: {linha[:50]}...")
-            func, msg = test_link(linha)
-            if func:
-                ok += 1
-                print(f"  ✅ {msg}")
-            else:
-                falha += 1
-                print(f"  ❌ {msg}")
-    
-    print(f"\n✅ OK: {ok}")
-    print(f"❌ Falha: {falha}")
-
-if __name__ == "__main__":
-    process_playlist()
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install requests
+      - run: python scripts/check_links.py
+      - run: |
+          git config --global user.name "Robô"
+          git config --global user.email "bot@angostream.ao"
+          git add playlist_angostream.m3u
+          git add relatorio.txt 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "Atualização automática"
+          git push
